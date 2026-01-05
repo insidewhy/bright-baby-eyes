@@ -1,0 +1,54 @@
+{
+  "name": "bright-baby-eyes",
+  "version": "1.0.0",
+  "description": "A high-performance LRU cache implementation in TypeScript",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "index.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup index.ts --format cjs,esm --dts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "lru",
+    "lru-cache",
+    "cache",
+    "least-recently-used",
+    "performance",
+    "typescript",
+    "doubly-linked-list",
+    "o1",
+    "fast"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/insidewhy/bright-baby-eyes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/insidewhy/bright-baby-eyes/issues"
+  },
+  "homepage": "https://github.com/insidewhy/bright-baby-eyes#readme"
+}
