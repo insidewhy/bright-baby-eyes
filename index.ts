@@ -2,7 +2,7 @@ export const empty = Symbol()
 export type Empty = typeof empty
 
 interface DoublyLinkedListEntry<K, V> {
-  value: V | typeof empty
+  value: V | undefined
   key: K | typeof empty
   prev: DoublyLinkedListEntry<K, V> | undefined
   next: DoublyLinkedListEntry<K, V> | undefined
@@ -16,16 +16,28 @@ export class LRUCache<K, V> {
   constructor(capacity: number) {
     if (capacity < 1) throw new Error('Capacity must be a positive integer')
 
-    // preallocate the priority list, this removes GC pressure during use
-    this.#priorityListHead = { value: empty, key: empty, prev: undefined, next: undefined }
+    // preallocate the priority list, this reduces the number of allocations
+    // during normal operation, leads to predicable memory usage and provides
+    // better cache locality for the cpu
+    this.#priorityListHead = { value: undefined, key: empty, prev: undefined, next: undefined }
     let priorityListPtr = this.#priorityListHead
     for (let i = 1; i < capacity - 1; ++i) {
-      priorityListPtr.next = { key: empty, value: empty, prev: priorityListPtr, next: undefined }
+      priorityListPtr.next = {
+        key: empty,
+        value: undefined,
+        prev: priorityListPtr,
+        next: undefined,
+      }
       priorityListPtr = priorityListPtr.next
     }
 
     if (capacity > 1) {
-      this.#priorityListEnd = { key: empty, value: empty, prev: priorityListPtr, next: undefined }
+      this.#priorityListEnd = {
+        key: empty,
+        value: undefined,
+        prev: priorityListPtr,
+        next: undefined,
+      }
       priorityListPtr.next = this.#priorityListEnd
     } else {
       this.#priorityListEnd = this.#priorityListHead
@@ -55,7 +67,7 @@ export class LRUCache<K, V> {
     const cacheEntry = this.#entryMap.get(key)
     if (!cacheEntry) return empty
     this.promoteToHeadOfPriorityList(cacheEntry)
-    return cacheEntry.value
+    return cacheEntry.value!
   }
 
   put(key: K, value: V): void {
@@ -114,7 +126,7 @@ export class LRUCache<K, V> {
     }
 
     cacheEntry.key = empty
-    cacheEntry.value = empty
+    cacheEntry.value = undefined
 
     return true
   }
