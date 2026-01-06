@@ -108,7 +108,7 @@ Inserts or updates a key-value pair in the cache. If the cache is at capacity, e
 
 **Time Complexity:** O(1)
 
-### `cache.set(key: K, value: V): void`
+### `cache.set(key: K, value: V): LRUCache<K, V>`
 
 The same as `cache.put` but returns `cache` allowing calls to be chained:
 
