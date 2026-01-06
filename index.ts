@@ -85,4 +85,37 @@ export class LRUCache<K, V> {
       this.#priorityListEnd.next = undefined
     }
   }
+
+  // For compatibility with Map
+  set(key: K, value: V): LRUCache<K, V> {
+    this.put(key, value)
+    return this
+  }
+
+  delete(key: K): boolean {
+    const cacheEntry = this.#entryMap.get(key)
+    if (!cacheEntry) return false
+
+    this.#entryMap.delete(key)
+
+    if (cacheEntry !== this.#priorityListEnd) {
+      if (cacheEntry === this.#priorityListHead) {
+        this.#priorityListHead = this.#priorityListHead.next!
+        this.#priorityListHead.prev = undefined
+      } else {
+        cacheEntry.next!.prev = cacheEntry.prev
+        cacheEntry.prev!.next = cacheEntry.next
+      }
+
+      cacheEntry.prev = this.#priorityListEnd
+      cacheEntry.next = undefined
+      this.#priorityListEnd.next = cacheEntry
+      this.#priorityListEnd = cacheEntry
+    }
+
+    cacheEntry.key = empty
+    cacheEntry.value = empty
+
+    return true
+  }
 }

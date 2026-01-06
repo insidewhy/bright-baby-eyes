@@ -103,6 +103,133 @@ describe('LRUCache', () => {
     })
   })
 
+  describe('delete', () => {
+    it('returns false when deleting non-existent key', () => {
+      const cache = new LRUCache<string, number>(3)
+      expect(cache.delete('nonexistent')).toBe(false)
+    })
+
+    it('returns true when deleting existing key', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('key', 42)
+      expect(cache.delete('key')).toBe(true)
+    })
+
+    it('makes deleted key unavailable', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('key', 42)
+      cache.delete('key')
+      expect(cache.get('key')).toBe(empty)
+    })
+
+    it('deletes value at the head of the queue', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+
+      expect(cache.delete('c')).toBe(true)
+      expect(cache.get('c')).toBe(empty)
+      expect(cache.get('a')).toBe(1)
+      expect(cache.get('b')).toBe(2)
+    })
+
+    it('deletes value at the tail of the queue', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+
+      expect(cache.delete('a')).toBe(true)
+      expect(cache.get('a')).toBe(empty)
+      expect(cache.get('b')).toBe(2)
+      expect(cache.get('c')).toBe(3)
+    })
+
+    it('deletes value in the middle of the queue', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+
+      expect(cache.delete('b')).toBe(true)
+      expect(cache.get('b')).toBe(empty)
+      expect(cache.get('a')).toBe(1)
+      expect(cache.get('c')).toBe(3)
+    })
+
+    it('works with cache of size 1', () => {
+      const cache = new LRUCache<string, number>(1)
+      cache.put('a', 1)
+      expect(cache.delete('a')).toBe(true)
+      expect(cache.get('a')).toBe(empty)
+    })
+
+    it('allows new values to be added after deletion in size 1 cache', () => {
+      const cache = new LRUCache<string, number>(1)
+      cache.put('a', 1)
+      cache.delete('a')
+      cache.put('b', 2)
+      expect(cache.get('a')).toBe(empty)
+      expect(cache.get('b')).toBe(2)
+    })
+
+    it('increases available capacity after deletion', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+
+      cache.delete('a')
+
+      cache.put('d', 4)
+      cache.put('e', 5)
+
+      expect(cache.get('b')).toBe(empty)
+      expect(cache.get('c')).toBe(3)
+      expect(cache.get('d')).toBe(4)
+      expect(cache.get('e')).toBe(5)
+    })
+
+    it('handles deletion followed by eviction', () => {
+      const cache = new LRUCache<string, number>(3)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+
+      cache.delete('b')
+
+      cache.put('d', 4)
+      cache.put('e', 5)
+      cache.put('f', 6)
+
+      expect(cache.get('a')).toBe(empty)
+      expect(cache.get('b')).toBe(empty)
+      expect(cache.get('c')).toBe(empty)
+      expect(cache.get('d')).toBe(4)
+      expect(cache.get('e')).toBe(5)
+      expect(cache.get('f')).toBe(6)
+    })
+
+    it('handles multiple deletions', () => {
+      const cache = new LRUCache<string, number>(5)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.put('c', 3)
+      cache.put('d', 4)
+      cache.put('e', 5)
+
+      cache.delete('b')
+      cache.delete('d')
+
+      expect(cache.get('a')).toBe(1)
+      expect(cache.get('b')).toBe(empty)
+      expect(cache.get('c')).toBe(3)
+      expect(cache.get('d')).toBe(empty)
+      expect(cache.get('e')).toBe(5)
+    })
+  })
+
   describe('capacity edge cases', () => {
     it('works with capacity of 1', () => {
       const cache = new LRUCache<string, number>(1)

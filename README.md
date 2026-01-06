@@ -108,6 +108,20 @@ Inserts or updates a key-value pair in the cache. If the cache is at capacity, e
 
 **Time Complexity:** O(1)
 
+### `cache.set(key: K, value: V): void`
+
+The same as `cache.put` but returns `cache` allowing calls to be chained:
+
+```typescript
+cache.set(1, 2).set(3, 4)
+```
+
+### `cache.delete(key: K): boolean`
+
+Remove a key-value pair from the cache if it exists and returns `true`, otherwise returns `false`.
+
+**Time Complexity:** O(1)
+
 ### `empty` Symbol
 
 A unique symbol exported by the library to distinguish cache misses from `undefined` values.
