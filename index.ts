@@ -34,10 +34,15 @@ export class LRUCache<K, V> {
 
   private promoteToHeadOfPriorityList(listEntry: DoublyLinkedListEntry<K, V>): void {
     if (this.#priorityListHead === listEntry) return
-    if (this.#priorityListEnd === listEntry) this.#priorityListEnd = this.#priorityListEnd.prev!
+    if (this.#priorityListEnd === listEntry) {
+      this.#priorityListEnd = this.#priorityListEnd.prev!
+    } else {
+      // listEntry.next must be defined since it's not at the end of the queue
+      listEntry.next!.prev = listEntry.prev
+    }
 
-    if (listEntry.next) listEntry.next.prev = listEntry.prev
-    if (listEntry.prev) listEntry.prev.next = listEntry.next
+    // listEntry.prev must be defined since it's not at the head of the queue
+    listEntry.prev!.next = listEntry.next
 
     listEntry.prev = undefined
     listEntry.next = this.#priorityListHead
